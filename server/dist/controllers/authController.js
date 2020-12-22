@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.signup = void 0;
+exports.test = exports.authCheck = exports.login = exports.signup = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const usersModel_1 = __importDefault(require("../models/usersModel"));
@@ -21,6 +21,12 @@ const signToken = (id) => {
     return jsonwebtoken_1.default.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN,
     });
+};
+const changePasswordAfter = (jwtTimestamp, user) => {
+    // console.log(new Date(user.updatedAt!).getTime() / 1000);
+    // console.log(jwtTimestamp);
+    const updatedDate = new Date(user.updatedAt).getTime() / 1000;
+    return jwtTimestamp < updatedDate;
 };
 const createSendToken = (user, statusCode, req, res) => {
     const token = signToken(user._id);
@@ -38,7 +44,7 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 const signup = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password } = req.body;
-    const encryptPass = yield bcryptjs_1.default.hash(password, 12);
+    const encryptPass = yield bcryptjs_1.default.hash(password.toString(), 12);
     try {
         const newUser = yield usersModel_1.default.create({
             name,
@@ -60,13 +66,12 @@ const correctPassword = (sentPassword, userPassword) => __awaiter(void 0, void 0
 });
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { email, password } = req.body;
+        const { email } = req.body;
+        const password = req.body.password.toString();
         if (!email || !password) {
             return next(new appError_1.default('Please provide email and password'));
         }
         const user = yield usersModel_1.default.findOne({ email }).select('+password');
-        const passwordCorrect = yield correctPassword(password, user.password);
-        console.log(passwordCorrect);
         if (!user || !(yield correctPassword(password, user.password))) {
             return next(new appError_1.default('Incorrect email or password'));
         }
@@ -77,3 +82,37 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.login = login;
+const authCheck = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let token;
+    if (req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+    }
+    if (!token) {
+        return next(new appError_1.default('You are not logged in!'));
+    }
+    try {
+        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        const currentUser = yield usersModel_1.default.findById(decoded.id);
+        if (!currentUser) {
+            return next(new appError_1.default('The user belonging to this token does no longer exist'));
+        }
+        if (changePasswordAfter(decoded.exp, currentUser)) {
+            return next(new appError_1.default('User recently changed password! please login again'));
+        }
+        res.locals.user = currentUser;
+        next();
+    }
+    catch (error) {
+        return next(new appError_1.default(error.message));
+    }
+    // const verifyPromise = promisify(jwt.verify);
+});
+exports.authCheck = authCheck;
+const test = (req, res, next) => {
+    console.log(res.locals.user);
+    res.status(200).json({
+        status: 'success',
+    });
+};
+exports.test = test;
