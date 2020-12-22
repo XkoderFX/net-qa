@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from 'mongoose';
-const { ObjectId } = Schema.Types;
 
 interface UserIn extends Document {
   name: string;

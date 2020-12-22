@@ -1,6 +1,4 @@
-import jwt, { sign } from 'jsonwebtoken';
-import { promisify } from 'util';
-import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response } from 'express';
 import User from '../models/usersModel';
@@ -50,6 +48,7 @@ const createSendToken = (
         name: user.name,
         email: user.email,
         role: user.role,
+        id: user._id,
       },
     },
   });
