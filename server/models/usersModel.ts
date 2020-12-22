@@ -1,6 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
 const { ObjectId } = Schema.Types;
-import bcrypt from 'bcryptjs';
 
 interface UserIn extends Document {
   name: string;

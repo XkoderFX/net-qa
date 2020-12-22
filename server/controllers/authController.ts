@@ -48,12 +48,18 @@ export const signup = async (
   const { name, email, password } = (req.body as UserIn)!;
   const encryptPass = await bcrypt.hash(password, 12);
 
-  const newUser = await User.create({
-    name,
-    email,
-    role: 'user',
-    password: encryptPass,
-  });
+  try {
+    const newUser = await User.create({
+      name,
+      email,
+      role: 'user',
+      password: encryptPass,
+    });
 
-  createSendToken(newUser, 201, req, res);
+    createSendToken(newUser, 201, req, res);
+  } catch (error) {
+    return res.status(400).send({
+      err: error.message,
+    });
+  }
 };

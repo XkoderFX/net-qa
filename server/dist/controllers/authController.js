@@ -38,12 +38,19 @@ const createSendToken = (user, statusCode, req, res) => {
 const signup = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password } = req.body;
     const encryptPass = yield bcryptjs_1.default.hash(password, 12);
-    const newUser = yield usersModel_1.default.create({
-        name,
-        email,
-        role: 'user',
-        password: encryptPass,
-    });
-    createSendToken(newUser, 201, req, res);
+    try {
+        const newUser = yield usersModel_1.default.create({
+            name,
+            email,
+            role: 'user',
+            password: encryptPass,
+        });
+        createSendToken(newUser, 201, req, res);
+    }
+    catch (error) {
+        return res.status(400).send({
+            err: error.message,
+        });
+    }
 });
 exports.signup = signup;
