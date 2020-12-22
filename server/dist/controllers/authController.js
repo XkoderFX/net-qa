@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signup = void 0;
+exports.login = exports.signup = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const usersModel_1 = __importDefault(require("../models/usersModel"));
+const appError_1 = __importDefault(require("../utils/appError"));
 const signToken = (id) => {
     return jsonwebtoken_1.default.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN,
@@ -54,3 +55,25 @@ const signup = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.signup = signup;
+const correctPassword = (sentPassword, userPassword) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield bcryptjs_1.default.compare(sentPassword, userPassword);
+});
+const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return next(new appError_1.default('Please provide email and password'));
+        }
+        const user = yield usersModel_1.default.findOne({ email }).select('+password');
+        const passwordCorrect = yield correctPassword(password, user.password);
+        console.log(passwordCorrect);
+        if (!user || !(yield correctPassword(password, user.password))) {
+            return next(new appError_1.default('Incorrect email or password'));
+        }
+        createSendToken(user, 200, req, res);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.login = login;

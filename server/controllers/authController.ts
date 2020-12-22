@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response } from 'express';
 import User from '../models/usersModel';
+import AppError from '../utils/appError';
 
 interface UserIn {
   _id?: string;
@@ -61,5 +62,36 @@ export const signup = async (
     return res.status(400).send({
       err: error.message,
     });
+  }
+};
+
+const correctPassword = async (sentPassword: string, userPassword: string) => {
+  return await bcrypt.compare(sentPassword, userPassword);
+};
+
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return next(new AppError('Please provide email and password'));
+    }
+
+    const user = await User.findOne({ email }).select('+password');
+
+    const passwordCorrect = await correctPassword(password, user!.password);
+    console.log(passwordCorrect);
+
+    if (!user || !(await correctPassword(password, user.password))) {
+      return next(new AppError('Incorrect email or password'));
+    }
+
+    createSendToken(user!, 200, req, res);
+  } catch (error) {
+    next(error);
   }
 };
