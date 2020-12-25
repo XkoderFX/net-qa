@@ -1,0 +1,23 @@
+/* Set default font-family */
+.ql-editor {
+    font-family: "Roboto";
+}
+
+.ql-editor p {
+    font-size: 16px;
+}
+
+/* Set dropdown font-families */
+.ql-font span[data-label="Roboto"]::before {
+    font-family: "Roboto";
+}
+
+.ql-font span[data-label="Roboto"]::before {
+    font-family: "Roboto" !important;
+}
+
+/* Set content font-families */
+
+.ql-font-Roboto {
+    font-family: "Roboto";
+}

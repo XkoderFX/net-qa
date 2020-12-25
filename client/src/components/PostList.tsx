@@ -13,7 +13,6 @@ import {
 } from "@material-ui/core";
 import { ExpandLess } from "@material-ui/icons";
 import ExpandMore from "@material-ui/icons/ExpandMore";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 import React from "react";
 
@@ -39,7 +38,6 @@ const PostList: React.FC<PostListProps> = ({ items }) => {
 
     return (
         <Paper>
-            <Box my={3}>
                 <List component="nav">
                     {items.map((item, index) => (
                         <>
@@ -73,7 +71,6 @@ const PostList: React.FC<PostListProps> = ({ items }) => {
                         </>
                     ))}
                 </List>
-            </Box>
         </Paper>
     );
 };
