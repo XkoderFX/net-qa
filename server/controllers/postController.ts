@@ -13,7 +13,6 @@ export const createPost = async (
   next: NextFunction
 ) => {
   const { category, body } = req.body as PostIn;
-  console.log('res.locals: ', res.locals.user);
 
   const newPost = await Post.create({
     userID: res.locals.user._id,

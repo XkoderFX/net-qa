@@ -146,13 +146,4 @@ export const authCheck = async (
   } catch (error) {
     return next(new AppError(error.message));
   }
-
-  // const verifyPromise = promisify(jwt.verify);
-};
-
-export const test = (req: Request, res: Response, next: NextFunction) => {
-  console.log(res.locals.user);
-  res.status(200).json({
-    status: 'success',
-  });
 };
