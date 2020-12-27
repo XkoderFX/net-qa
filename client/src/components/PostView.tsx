@@ -1,11 +1,26 @@
-import React from 'react'
+import { Breadcrumbs, Link, Typography } from "@material-ui/core";
+import React from "react";
+import parse from "html-react-parser";
+import { Article } from "../redux/Post";
 
-const PostView = () => {
-    return (
-        <div>
-            
-        </div>
-    )
+interface PostViewProps {
+    category: string;
+    article: Article;
 }
 
-export default PostView
+const PostView: React.FC<PostViewProps> = ({ category, article }) => {
+    const htmlInput = article.body;
+    console.log(htmlInput);
+
+    return (
+        <div>
+            <Breadcrumbs aria-label="breadcrumb">
+                <Link>{category}</Link>
+                <Link color="inherit">{article.name}</Link>
+            </Breadcrumbs>
+            {parse(htmlInput)}
+        </div>
+    );
+};
+
+export default PostView;

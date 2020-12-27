@@ -15,62 +15,70 @@ import { ExpandLess } from "@material-ui/icons";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 
 import React from "react";
+import { useDispatch } from "react-redux";
+import Post from "../redux/Post";
+import { changeCurrentPost } from "../redux/posts/postActions";
 
 interface PostListProps {
-    items: TreeItem[];
-}
-
-interface TreeItem {
-    category: string;
-    posts: { name: string }[];
+    items: Post[];
 }
 
 const PostList: React.FC<PostListProps> = ({ items }) => {
+    const dispatch = useDispatch();
+
     const [collapsed, setCollapsed] = React.useState<{
-        [index: number]: boolean;
+        [index: string]: boolean;
     }>({});
-    const handleCollapse = (index: number) => {
+    const handleCollapse = (index: string) => {
         setCollapsed((collapsed) => ({
             ...collapsed,
             [index]: !collapsed[index],
         }));
     };
 
+    const handleListClick = (categoryId: string, postId: string) => {
+        dispatch(changeCurrentPost(categoryId, postId));
+    };
+
     return (
         <Paper>
-                <List component="nav">
-                    {items.map((item, index) => (
-                        <>
-                            <ListItem
-                                button
-                                onClick={() => handleCollapse(index)}
-                            >
-                                <ListItemText primary={item.category} />
-                                {collapsed[index] ? (
-                                    <ExpandLess />
-                                ) : (
-                                    <ExpandMore />
-                                )}
-                            </ListItem>
+            <List component="nav">
+                {items.map((item) => (
+                    <>
+                        <ListItem
+                            button
+                            onClick={() => handleCollapse(item.id)}
+                        >
+                            <ListItemText primary={item.category} />
+                            {collapsed[item.id] ? (
+                                <ExpandLess />
+                            ) : (
+                                <ExpandMore />
+                            )}
+                        </ListItem>
 
-                            <Collapse
-                                in={collapsed[index]}
-                                timeout="auto"
-                                unmountOnExit
-                            >
-                                <List disablePadding>
-                                    {item.posts.map((subject) => (
-                                        <ListItem button>
-                                            <ListItemText
-                                                primary={subject.name}
-                                            />
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Collapse>
-                        </>
-                    ))}
-                </List>
+                        <Collapse
+                            in={collapsed[item.id]}
+                            timeout="auto"
+                            unmountOnExit
+                        >
+                            <List disablePadding>
+                                {item.posts.map((post) => (
+                                    <ListItem
+                                        onClick={() =>
+                                            handleListClick(item.id, post.id)
+                                        }
+                                        key={post.id}
+                                        button
+                                    >
+                                        <ListItemText primary={post.name} />
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Collapse>
+                    </>
+                ))}
+            </List>
         </Paper>
     );
 };

@@ -1,34 +1,27 @@
-import { Box, Container, Grid } from "@material-ui/core";
-import React from "react";
+import { Box, Container, Grid, Typography } from "@material-ui/core";
+import React, { useEffect } from "react";
 import PostEdit from "../components/PostEdit";
 import PostList from "../components/PostList";
 import PostView from "../components/PostView";
+import Post from "../redux/Post";
+import { fetchPosts } from "../redux/posts/postActions";
+import { PostState } from "../redux/posts/postReducer";
+import { useSelector, useDispatch } from "react-redux";
 
 const Main = () => {
-    const [mode, setMode] = React.useState<"editing" | "creating">();
-    const [postData, setPostData] = React.useState([
-        {
-            category: "web",
-            posts: [{ name: "html" }, { name: "css" }, { name: "javascript" }],
-        },
-        {
-            category: "math",
-            posts: [
-                { name: "calculus" },
-                { name: "equations" },
-                { name: "geometry" },
-            ],
-        },
+    const dispatch = useDispatch();
+    const postData = useSelector(
+        (state: { postsReducer: PostState }) => state.postsReducer.posts
+    );
+    const currentPost = useSelector(
+        (state: { postsReducer: PostState }) => state.postsReducer.currentPost
+    );
 
-        {
-            category: "english",
-            posts: [
-                { name: "vocabulary" },
-                { name: "grammar" },
-                { name: "practice" },
-            ],
-        },
-    ]);
+    useEffect(() => {
+        dispatch(fetchPosts());
+    }, []);
+
+    console.log(postData);
 
     return (
         <Container maxWidth="xl">
@@ -40,7 +33,19 @@ const Main = () => {
                 </Grid>
                 <Grid item xs={8}>
                     <Box my={3}>
-                        <PostEdit></PostEdit>
+                        {currentPost ? (
+                            <PostView
+                                category={currentPost.category}
+                                article={currentPost}
+                            ></PostView>
+                        ) : (
+                            <>
+                                <Typography paragraph variant="h4">
+                                    Create a post
+                                </Typography>
+                                <PostEdit></PostEdit>{" "}
+                            </>
+                        )}
                     </Box>
                 </Grid>
             </Grid>

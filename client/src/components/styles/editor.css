@@ -1,6 +1,10 @@
-/* Set default font-family */
 .ql-editor {
     font-family: "Roboto";
+    height: 500px;
+}
+
+.ql-container .ql-snow {
+    height: 500px;
 }
 
 .ql-editor p {
