@@ -14,6 +14,12 @@ export interface PostChangeAction {
     payload?: Article;
 }
 
+export interface PostCreateAction {
+    type: postTypes;
+    payload?: { post: Post | Article; index: number };
+}
+
+
 const data: Post[] = [
     {
         id: uuid(),
@@ -119,3 +125,53 @@ export const changeCurrentPost = (categoryId: string, postId: string) => (
 
     dispatch({ type: postTypes.CHANGE_CURRENT_POST, payload: post });
 };
+
+export const createArticle = ({
+    name,
+    body,
+    category,
+}: Omit<Article, "id">) => (dispatch: Dispatch<PostCreateAction>) => {
+    const article = {
+        name: name,
+        id: uuid(),
+        body,
+        category: category,
+    };
+
+    dispatch({ type: postTypes.CREATE_POST_REQUEST });
+
+    // check if category exists in database
+    const categoryExists = data.find((post) => post.category === category);
+
+    // true => add the article to the existent category
+
+    if (categoryExists) {
+        categoryExists?.posts.push(article);
+        const index = data.findIndex((post) => post.id === categoryExists?.id);
+        data[index] = categoryExists!;
+
+        dispatch({
+            type: postTypes.CREATE_POST_SUCCESS,
+            payload: { post: data[index], index },
+        });
+    }
+
+    // false => add new category for the article
+    else {
+        const post = {
+            id: uuid(),
+            category: category,
+            posts: [article],
+        };
+        data.push(post);
+
+        dispatch({
+            type: postTypes.CREATE_POST_SUCCESS,
+            payload: { post, index: -1 },
+        });
+    }
+};
+
+export const resetCurrentPost = () => ({
+    type: postTypes.RESET_CURRENT_POST,
+}); 

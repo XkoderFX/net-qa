@@ -4,7 +4,7 @@ import PostEdit from "../components/PostEdit";
 import PostList from "../components/PostList";
 import PostView from "../components/PostView";
 import Post from "../redux/Post";
-import { fetchPosts } from "../redux/posts/postActions";
+import { createArticle, fetchPosts } from "../redux/posts/postActions";
 import { PostState } from "../redux/posts/postReducer";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -16,6 +16,14 @@ const Main = () => {
     const currentPost = useSelector(
         (state: { postsReducer: PostState }) => state.postsReducer.currentPost
     );
+
+    const handlePostSave = (
+        category: string,
+        name: string,
+        content: string
+    ) => {
+        dispatch(createArticle({ name, body: content, category }));
+    };
 
     useEffect(() => {
         dispatch(fetchPosts());
@@ -43,7 +51,14 @@ const Main = () => {
                                 <Typography paragraph variant="h4">
                                     Create a post
                                 </Typography>
-                                <PostEdit></PostEdit>{" "}
+                                <PostEdit
+                                    onSave={(category, name, content) => {
+                                        console.log(
+                                            `${category} ${name} ${content}`
+                                        );
+                                        handlePostSave(category, name, content);
+                                    }}
+                                ></PostEdit>
                             </>
                         )}
                     </Box>

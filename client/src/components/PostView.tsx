@@ -10,7 +10,6 @@ interface PostViewProps {
 
 const PostView: React.FC<PostViewProps> = ({ category, article }) => {
     const htmlInput = article.body;
-    console.log(htmlInput);
 
     return (
         <div>

@@ -1,5 +1,5 @@
 import { Box, Button, makeStyles, Paper, TextField } from "@material-ui/core";
-import React, { useEffect } from "react";
+import React, { ChangeEvent, useEffect } from "react";
 import { useState } from "react";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -13,8 +13,14 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const PostView = () => {
-    const [value, setValue] = useState("");
+interface PostViewProps {
+    onSave: (category: string, name: string, content: string) => void;
+}
+
+const PostView: React.FC<PostViewProps> = ({ onSave }) => {
+    const [value, setValue] = useState(""); // quill text body
+    const [name, setName] = useState("");
+    const [category, setCategory] = useState({ title: "" });
     const [categories, setCategories] = useState([
         { title: "web" },
         { title: "math" },
@@ -57,7 +63,21 @@ const PostView = () => {
                 onChange={setValue}
             />
             <Box my={2}>
+                <TextField
+                    style={{ width: 300 }}
+                    onChange={(e) => setName(e.target.value)}
+                    label="name"
+                    variant="filled"
+                />
+            </Box>
+            <Box my={2}>
                 <Autocomplete
+                    onChange={(
+                        event: ChangeEvent<{}>,
+                        categorySelected: { title: string } | null
+                    ) => {
+                        setCategory(categorySelected!);
+                    }}
                     options={categories}
                     getOptionLabel={(option: { title: string }) => option.title}
                     style={{ width: 300 }}
@@ -73,6 +93,9 @@ const PostView = () => {
 
             <Box display="flex" my={2}>
                 <Button
+                    onClick={() => {
+                        onSave(category.title, name, value);
+                    }}
                     variant="contained"
                     className={classes.button}
                     color="primary"
