@@ -19,18 +19,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CategorySchema = void 0;
+exports.ArticleSchema = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const Article_1 = require("./Article");
-exports.CategorySchema = new mongoose_1.Schema({
-    category: {
-        type: String,
-        required: true,
-    },
-    articles: {
-        default: [],
-        type: [Article_1.ArticleSchema],
-    },
+exports.ArticleSchema = new mongoose_1.Schema({
+    id: String,
+    name: String,
+    body: String,
+    category: String,
+    userId: mongoose_1.Schema.Types.ObjectId,
 });
-const Category = mongoose_1.default.model("Category", exports.CategorySchema);
-exports.default = Category;
+const Article = mongoose_1.default.model("Article", exports.ArticleSchema);
+exports.default = Article;

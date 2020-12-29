@@ -1,19 +1,35 @@
-import { Router } from 'express';
-import { authCheck } from '../controllers/authController';
+import { Router } from "express";
+import { authCheck } from "../controllers/authController";
 import {
-  createPost,
-  getAllPosts,
-  getPost,
-  updatePost,
-} from '../controllers/postController';
+    createArticle,
+    createCategory,
+    getCategories,
+} from "../controllers/postController";
 
 const router = Router();
 
-router.use(authCheck);
+/*
+ * METHOD: GET
+ * URI: /api/categories
+ * get all categories
+ */
 
-router.post('/', createPost);
-router.patch('/:id', updatePost);
-router.get('/:id', getPost);
-router.get('/', getAllPosts);
+router.route("/").get(getCategories);
+
+/*
+ * METHOD: POST
+ * URI: /api/categories
+ * creating new category
+ */
+
+router.route("/").post(createCategory);
+
+/*
+ * METHOD: POST
+ * URI: /api/categories/:categoryName
+ * creating new article
+ */
+
+router.route("/:categoryName").post(createArticle);
 
 export default router;

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.test = exports.authCheck = exports.login = exports.signup = void 0;
+exports.authCheck = exports.login = exports.signup = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const usersModel_1 = __importDefault(require("../models/usersModel"));
@@ -107,13 +107,5 @@ const authCheck = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     catch (error) {
         return next(new appError_1.default(error.message));
     }
-    // const verifyPromise = promisify(jwt.verify);
 });
 exports.authCheck = authCheck;
-const test = (req, res, next) => {
-    console.log(res.locals.user);
-    res.status(200).json({
-        status: 'success',
-    });
-};
-exports.test = test;
