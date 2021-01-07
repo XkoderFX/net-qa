@@ -3,6 +3,7 @@ import { postTypes } from "./postTypes";
 import { uuid } from "uuidv4";
 import { PostState } from "./postReducer";
 import { Dispatch } from "redux";
+import axios from "axios";
 
 export interface PostFetchAction {
     type: postTypes;
@@ -16,84 +17,12 @@ export interface PostChangeAction {
 
 export interface PostCreateAction {
     type: postTypes;
-    payload?: { post: Post | Article; index: number };
+    payload?: Post;
 }
 
-
-const data: Post[] = [
-    {
-        id: uuid(),
-        category: "web",
-        posts: [
-            {
-                id: uuid(),
-                name: "html",
-                body: `<h1>react + ts</h1><p>paragraph</p>`,
-                category: "web",
-            },
-            { id: uuid(), name: "css", body: "CSS", category: "web" },
-            {
-                id: uuid(),
-                name: "javascript",
-                body: "JavaScript",
-                category: "web",
-            },
-        ],
-    },
-    {
-        id: uuid(),
-        category: "math",
-        posts: [
-            {
-                id: uuid(),
-                name: "calculus",
-                body: "CALCULUS",
-                category: "math",
-            },
-            {
-                id: uuid(),
-                name: "equations",
-                body: "EQUATIONS",
-                category: "math",
-            },
-            {
-                id: uuid(),
-                name: "geometry",
-                body: "GEOMETRY",
-                category: "math",
-            },
-        ],
-    },
-
-    {
-        id: uuid(),
-        category: "english",
-        posts: [
-            {
-                id: uuid(),
-                name: "vocabulary",
-                body: "VOCABULARY",
-                category: "english",
-            },
-            {
-                id: uuid(),
-                name: "grammar",
-                body: "GRAMMAR",
-                category: "english",
-            },
-            {
-                id: uuid(),
-                name: "practice",
-                body: "PRACTICE",
-                category: "english",
-            },
-        ],
-    },
-];
-
-export const fetchPosts = () => (dispatch: Dispatch<PostFetchAction>) => {
+export const fetchPosts = () => async (dispatch: Dispatch<PostFetchAction>) => {
     dispatch(fetchPostsRequest());
-    //TODO fetching logic should be here
+    const { data } = await axios.get("http://localhost:3000/api/categories");
     dispatch(fetchPostsSuccess(data));
 };
 
@@ -119,8 +48,8 @@ export const changeCurrentPost = (categoryId: string, postId: string) => (
         postsReducer: { posts },
     } = getState();
 
-    const subject = posts.find((post) => post.id === categoryId);
-    const post = subject?.posts.find((post) => post.id === postId);
+    const subject = posts.find((post) => post._id === categoryId);
+    const post = subject?.articles.find((articles) => articles._id === postId);
     console.log(post);
 
     dispatch({ type: postTypes.CHANGE_CURRENT_POST, payload: post });
@@ -130,48 +59,21 @@ export const createArticle = ({
     name,
     body,
     category,
-}: Omit<Article, "id">) => (dispatch: Dispatch<PostCreateAction>) => {
-    const article = {
-        name: name,
-        id: uuid(),
-        body,
-        category: category,
-    };
+}: Omit<Article, "_id">) => async (dispatch: Dispatch<PostCreateAction>) => {
 
-    dispatch({ type: postTypes.CREATE_POST_REQUEST });
+    const article: Omit<Article, "_id"> = { name, body, category };
 
-    // check if category exists in database
-    const categoryExists = data.find((post) => post.category === category);
-
-    // true => add the article to the existent category
-
-    if (categoryExists) {
-        categoryExists?.posts.push(article);
-        const index = data.findIndex((post) => post.id === categoryExists?.id);
-        data[index] = categoryExists!;
-
-        dispatch({
-            type: postTypes.CREATE_POST_SUCCESS,
-            payload: { post: data[index], index },
-        });
-    }
-
-    // false => add new category for the article
-    else {
-        const post = {
-            id: uuid(),
-            category: category,
-            posts: [article],
-        };
-        data.push(post);
-
-        dispatch({
-            type: postTypes.CREATE_POST_SUCCESS,
-            payload: { post, index: -1 },
-        });
+    try {
+        const { data } = await axios.post(
+            `http://localhost:3000/api/categories/${category}`,
+            article
+        );
+        dispatch({ type: postTypes.CREATE_POST_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({ type: postTypes.CREATE_POST_FAILURE, payload: error });
     }
 };
 
 export const resetCurrentPost = () => ({
     type: postTypes.RESET_CURRENT_POST,
-}); 
+});

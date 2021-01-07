@@ -1,76 +1,80 @@
-import { NextFunction, Request, Response } from 'express';
-import Post from '../models/postModel';
-import AppError from '../utils/appError';
+import { NextFunction, Request, Response } from "express";
+import Article, { IArticle } from "../models/Article";
+import Category from "../models/postModel";
+import AppError from "../utils/appError";
 
-interface PostIn {
-  category: string;
-  body: string;
-}
+/*
+ * METHOD: GET
+ * URI: /api/categories
+ * get all categories
+ */
 
-export const createPost = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { category, body } = req.body as PostIn;
-
-  const newPost = await Post.create({
-    userID: res.locals.user._id,
-    category,
-    body,
-  });
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      post: newPost,
-    },
-  });
+export const getCategories = async (req: Request, res: Response) => {
+    res.status(201).json(await Category.find({}));
 };
 
-export const getPost = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const post = await Post.findById(req.params.id).populate('userID');
+/*
+ * METHOD: POST
+ * URI: /api/categories
+ * creating new category
+ * BODY: {categoryName: string, posts: [{id, name, body, category, userId }]}
+ */
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      post,
-    },
-  });
+export const createCategory = async (req: Request, res: Response) => {
+    const {
+        categoryName,
+        posts,
+    }: { categoryName: string; posts: IArticle[] } = req.body;
+
+    const category = new Category({
+        category: categoryName,
+        articles: posts,
+    });
+
+    await category.save();
+
+    res.status(201).json(category);
 };
 
-export const updatePost = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-  });
+/*
+ * METHOD: POST
+ * URI: /api/categories/:categoryName
+ * creating new article
+ * PATH PARAMS: categoryName
+ * BODY: {name, body, userId}
+ */
 
-  if (!post) {
-    next(new AppError('No document found with this id'));
-  }
-  res.status(204).json({
-    status: 'success',
-  });
-};
+export const createArticle = async (req: Request, res: Response) => {
+    const {
+        name,
+        body,
+        userId,
+    }: {
+        name: string;
+        body: string;
+        userId: string;
+    } = req.body;
+    const categoryName = req.params.categoryName;
 
-export const getAllPosts = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const posts = await Post.find({});
+    const category = await Category.findOne({ category: categoryName });
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      posts,
-    },
-  });
+    const article = new Article({
+        name,
+        category: categoryName,
+        body,
+        userId,
+    });
+
+    if (category) {
+        category?.articles.push(article);
+        await category?.save();
+        res.status(201).json(category);
+    } else {
+        const category = new Category({
+            category: categoryName,
+            articles: [article],
+        });
+        await category?.save();
+        res.status(201).json(category);
+    }
 };

@@ -7,7 +7,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const usersSchema = new mongoose_1.default.Schema({
     name: {
         type: String,
-        required: [true, 'You must have a name'],
+        required: [true, "You must have a name"],
     },
     email: {
         type: String,
@@ -16,14 +16,14 @@ const usersSchema = new mongoose_1.default.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please provide a password'],
+        required: [true, "Please provide a password"],
         minlength: 5,
         select: false,
     },
     role: {
         type: String,
-        default: 'user',
+        default: "user",
     },
 }, { timestamps: true });
-const Users = mongoose_1.default.model('Users', usersSchema);
+const Users = mongoose_1.default.model("Users", usersSchema);
 exports.default = Users;

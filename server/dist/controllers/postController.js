@@ -12,53 +12,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllPosts = exports.updatePost = exports.getPost = exports.createPost = void 0;
+exports.createArticle = exports.createCategory = exports.getCategories = void 0;
+const Article_1 = __importDefault(require("../models/Article"));
 const postModel_1 = __importDefault(require("../models/postModel"));
-const appError_1 = __importDefault(require("../utils/appError"));
-const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { category, body } = req.body;
-    const newPost = yield postModel_1.default.create({
-        userID: res.locals.user._id,
-        category,
+/*
+ * METHOD: GET
+ * URI: /api/categories
+ * get all categories
+ */
+const getCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.status(201).json(yield postModel_1.default.find({}));
+});
+exports.getCategories = getCategories;
+/*
+ * METHOD: POST
+ * URI: /api/categories
+ * creating new category
+ * BODY: {categoryName: string, posts: [{id, name, body, category, userId }]}
+ */
+const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { categoryName, posts, } = req.body;
+    const category = new postModel_1.default({
+        category: categoryName,
+        articles: posts,
+    });
+    yield category.save();
+    res.status(201).json(category);
+});
+exports.createCategory = createCategory;
+/*
+ * METHOD: POST
+ * URI: /api/categories/:categoryName
+ * creating new article
+ * PATH PARAMS: categoryName
+ * BODY: {name, body, userId}
+ */
+const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, body, userId, } = req.body;
+    const categoryName = req.params.categoryName;
+    const category = yield postModel_1.default.findOne({ category: categoryName });
+    const article = new Article_1.default({
+        name,
+        category: categoryName,
         body,
+        userId,
     });
-    res.status(201).json({
-        status: 'success',
-        data: {
-            post: newPost,
-        },
-    });
-});
-exports.createPost = createPost;
-const getPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const post = yield postModel_1.default.findById(req.params.id).populate('userID');
-    res.status(200).json({
-        status: 'success',
-        data: {
-            post,
-        },
-    });
-});
-exports.getPost = getPost;
-const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const post = yield postModel_1.default.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-    });
-    if (!post) {
-        next(new appError_1.default('No document found with this id'));
+    if (category) {
+        category === null || category === void 0 ? void 0 : category.articles.push(article);
+        yield (category === null || category === void 0 ? void 0 : category.save());
+        res.status(201).json(category);
     }
-    res.status(204).json({
-        status: 'success',
-    });
+    else {
+        const category = new postModel_1.default({
+            category: categoryName,
+            articles: [article],
+        });
+        yield (category === null || category === void 0 ? void 0 : category.save());
+        res.status(201).json(category);
+    }
 });
-exports.updatePost = updatePost;
-const getAllPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const posts = yield postModel_1.default.find({});
-    res.status(200).json({
-        status: 'success',
-        data: {
-            posts,
-        },
-    });
-});
-exports.getAllPosts = getAllPosts;
+exports.createArticle = createArticle;

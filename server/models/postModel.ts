@@ -1,29 +1,22 @@
-import mongoose, { Schema, Document } from 'mongoose';
-const { ObjectId } = Schema.Types;
+import mongoose, { Schema, Document, Types } from "mongoose";
+import Article, { ArticleSchema, IArticle } from "./Article";
 
-interface PostIn extends Document {
-  userID: string;
-  category: string;
-  body: string;
+export interface ICategory extends Document {
+    id: string;
+    category: string;
+    articles: IArticle[];
 }
 
-const postSchema = new Schema(
-  {
-    body: {
-      type: String,
-      required: true,
-    },
+export const CategorySchema = new Schema<ICategory>({
     category: {
-      type: String,
-      required: true,
+        type: String,
+        required: true,
     },
-    userID: {
-      type: ObjectId,
-      ref: 'Users',
+    articles: {
+        default: [],
+        type: [ArticleSchema],
     },
-  },
-  { timestamps: true }
-);
+});
 
-const Post = mongoose.model<PostIn>('Posts', postSchema);
-export default Post;
+const Category = mongoose.model<ICategory>("Category", CategorySchema);
+export default Category;
