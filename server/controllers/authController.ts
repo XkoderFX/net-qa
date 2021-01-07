@@ -43,13 +43,12 @@ const createSendToken = (
   res.status(statusCode).json({
     status: 'success',
     token,
-    data: {
-      user: {
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        id: user._id,
-      },
+
+    user: {
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      id: user._id,
     },
   });
 };
@@ -59,10 +58,14 @@ export const signup = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { name, email, password } = (req.body as UserIn)!;
-  const encryptPass = await bcrypt.hash(password.toString(), 12);
-
   try {
+    const { name, email, password } = (req.body as UserIn)!;
+    const user = await User.findOne({ email });
+    if (user) {
+      return next(new AppError('User is already exist'));
+    }
+    const encryptPass = await bcrypt.hash(password.toString(), 12);
+
     const newUser = await User.create({
       name,
       email,
