@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.test = exports.authCheck = exports.login = exports.signup = void 0;
+exports.authCheck = exports.login = exports.signup = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const usersModel_1 = __importDefault(require("../models/usersModel"));
@@ -33,20 +33,22 @@ const createSendToken = (user, statusCode, req, res) => {
     res.status(statusCode).json({
         status: 'success',
         token,
-        data: {
-            user: {
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                id: user._id,
-            },
+        user: {
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            id: user._id,
         },
     });
 };
 const signup = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, email, password } = req.body;
-    const encryptPass = yield bcryptjs_1.default.hash(password.toString(), 12);
     try {
+        const { name, email, password } = req.body;
+        const user = yield usersModel_1.default.findOne({ email });
+        if (user) {
+            return next(new appError_1.default('User is already exist'));
+        }
+        const encryptPass = yield bcryptjs_1.default.hash(password.toString(), 12);
         const newUser = yield usersModel_1.default.create({
             name,
             email,
@@ -107,13 +109,5 @@ const authCheck = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     catch (error) {
         return next(new appError_1.default(error.message));
     }
-    // const verifyPromise = promisify(jwt.verify);
 });
 exports.authCheck = authCheck;
-const test = (req, res, next) => {
-    console.log(res.locals.user);
-    res.status(200).json({
-        status: 'success',
-    });
-};
-exports.test = test;

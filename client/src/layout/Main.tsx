@@ -1,8 +1,8 @@
 import { Box, Container, Grid, Typography } from "@material-ui/core";
 import React, { useEffect } from "react";
-import PostEdit from "../components/PostEdit";
-import PostList from "../components/PostList";
-import PostView from "../components/PostView";
+import PostEdit from "../components/posts/PostEdit";
+import PostList from "../components/posts/PostList";
+import PostView from "../components/posts/PostView";
 import Post from "../redux/Post";
 import { createArticle, fetchPosts } from "../redux/posts/postActions";
 import { PostState } from "../redux/posts/postReducer";

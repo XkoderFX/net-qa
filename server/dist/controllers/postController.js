@@ -17,7 +17,6 @@ const postModel_1 = __importDefault(require("../models/postModel"));
 const appError_1 = __importDefault(require("../utils/appError"));
 const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { category, body } = req.body;
-    console.log('res.locals: ', res.locals.user);
     const newPost = yield postModel_1.default.create({
         userID: res.locals.user._id,
         category,
