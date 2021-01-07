@@ -33,20 +33,22 @@ const createSendToken = (user, statusCode, req, res) => {
     res.status(statusCode).json({
         status: 'success',
         token,
-        data: {
-            user: {
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                id: user._id,
-            },
+        user: {
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            id: user._id,
         },
     });
 };
 const signup = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, email, password } = req.body;
-    const encryptPass = yield bcryptjs_1.default.hash(password.toString(), 12);
     try {
+        const { name, email, password } = req.body;
+        const user = yield usersModel_1.default.findOne({ email });
+        if (user) {
+            return next(new appError_1.default('User is already exist'));
+        }
+        const encryptPass = yield bcryptjs_1.default.hash(password.toString(), 12);
         const newUser = yield usersModel_1.default.create({
             name,
             email,
