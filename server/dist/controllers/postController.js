@@ -59,14 +59,16 @@ const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     });
     if (category) {
         category === null || category === void 0 ? void 0 : category.articles.push(article);
+        yield (category === null || category === void 0 ? void 0 : category.save());
+        res.status(201).json(category);
     }
     else {
         const category = new postModel_1.default({
             category: categoryName,
             articles: [article],
         });
+        yield (category === null || category === void 0 ? void 0 : category.save());
+        res.status(201).json(category);
     }
-    yield (category === null || category === void 0 ? void 0 : category.save());
-    res.status(201).json(category);
 });
 exports.createArticle = createArticle;

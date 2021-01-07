@@ -23,7 +23,7 @@ interface PostListProps {
     items: Post[];
 }
 
-const PostList: React.FC<PostListProps> = ({ items }) => {
+const PostList: React.FC<PostListProps> = ({ items = [] }) => {
     const dispatch = useDispatch();
 
     const [collapsed, setCollapsed] = React.useState<{
@@ -47,10 +47,10 @@ const PostList: React.FC<PostListProps> = ({ items }) => {
                     <>
                         <ListItem
                             button
-                            onClick={() => handleCollapse(item.id)}
+                            onClick={() => handleCollapse(item._id)}
                         >
                             <ListItemText primary={item.category} />
-                            {collapsed[item.id] ? (
+                            {collapsed[item._id] ? (
                                 <ExpandLess />
                             ) : (
                                 <ExpandMore />
@@ -58,17 +58,17 @@ const PostList: React.FC<PostListProps> = ({ items }) => {
                         </ListItem>
 
                         <Collapse
-                            in={collapsed[item.id]}
+                            in={collapsed[item._id]}
                             timeout="auto"
                             unmountOnExit
                         >
                             <List disablePadding>
-                                {item.posts.map((post) => (
+                                {item.articles.map((post) => (
                                     <ListItem
                                         onClick={() =>
-                                            handleListClick(item.id, post.id)
+                                            handleListClick(item._id, post._id)
                                         }
-                                        key={post.id}
+                                        key={post._id}
                                         button
                                     >
                                         <ListItemText primary={post.name} />

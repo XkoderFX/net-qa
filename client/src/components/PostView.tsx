@@ -1,4 +1,4 @@
-import { Breadcrumbs, Link, Typography } from "@material-ui/core";
+import { Breadcrumbs, Link, } from "@material-ui/core";
 import React from "react";
 import parse from "html-react-parser";
 import { Article } from "../redux/Post";

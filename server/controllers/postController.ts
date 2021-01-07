@@ -67,14 +67,14 @@ export const createArticle = async (req: Request, res: Response) => {
 
     if (category) {
         category?.articles.push(article);
+        await category?.save();
+        res.status(201).json(category);
     } else {
         const category = new Category({
             category: categoryName,
             articles: [article],
         });
+        await category?.save();
+        res.status(201).json(category);
     }
-
-    await category?.save();
-
-    res.status(201).json(category);
 };

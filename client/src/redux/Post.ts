@@ -1,11 +1,11 @@
 export default interface Post {
-    id: string;
+    _id: string;
     category: string;
-    posts: Article[];
+    articles: Article[];
 }
 
 export interface Article {
-    id: string;
+    _id: string;
     name: string;
     body: string;
     category: string;
