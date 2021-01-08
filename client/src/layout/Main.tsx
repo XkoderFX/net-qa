@@ -16,6 +16,9 @@ const Main = () => {
     const currentPost = useSelector(
         (state: { postsReducer: PostState }) => state.postsReducer.currentPost
     );
+    const searchKey = useSelector(
+        (state: { postsReducer: PostState }) => state.postsReducer.searchKey
+    );
 
     const handlePostSave = (
         category: string,
@@ -29,14 +32,16 @@ const Main = () => {
         dispatch(fetchPosts());
     }, []);
 
-    console.log(postData);
 
     return (
         <Container maxWidth="xl">
             <Grid spacing={2} container>
                 <Grid item xs={4}>
                     <Box my={3}>
-                        <PostList items={postData}></PostList>
+                        <PostList
+                            searchKey={searchKey}
+                            items={postData}
+                        ></PostList>
                     </Box>
                 </Grid>
                 <Grid item xs={8}>

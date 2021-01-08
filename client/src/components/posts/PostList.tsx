@@ -24,7 +24,7 @@ interface PostListProps {
     items: Post[];
 }
 
-const PostList: React.FC<PostListProps> = ({ items, searchKey }) => {
+const PostList: React.FC<PostListProps> = ({ items, searchKey = "" }) => {
     const dispatch = useDispatch();
 
     const [collapsed, setCollapsed] = React.useState<{
@@ -44,56 +44,52 @@ const PostList: React.FC<PostListProps> = ({ items, searchKey }) => {
     return (
         <Paper>
             <List component="nav">
-                {items?.map((item, i) => {
-                    if (item.category.includes(searchKey)) {
-                        return (
-                            <Box key={item._id}>
-                                <ListItem
-                                    button
-                                    onClick={() => handleCollapse(item._id)}
-                                    key={item._id}
-                                >
-                                    <ListItemText primary={item.category} />
-                                    {collapsed[item._id] ? (
-                                        <ExpandLess />
-                                    ) : (
-                                        <ExpandMore />
-                                    )}
-                                </ListItem>
+                {items?.map((item, i) => (
+                    <Box key={item._id}>
+                        <ListItem
+                            button
+                            onClick={() => handleCollapse(item._id)}
+                            key={item._id}
+                        >
+                            <ListItemText primary={item.category} />
+                            {collapsed[item._id] ? (
+                                <ExpandLess />
+                            ) : (
+                                <ExpandMore />
+                            )}
+                        </ListItem>
 
-                                <Collapse
-                                    key={item._id + i}
-                                    in={collapsed[item._id]}
-                                    timeout="auto"
-                                    unmountOnExit
-                                >
-                                    <List disablePadding key={Date.now() + i}>
-                                        {item.articles.map((post) => {
-                                            if (post.name.includes(searchKey)) {
-                                                return (
-                                                    <ListItem
-                                                        onClick={() =>
-                                                            handleListClick(
-                                                                item._id,
-                                                                post._id
-                                                            )
-                                                        }
-                                                        key={post._id}
-                                                        button
-                                                    >
-                                                        <ListItemText
-                                                            primary={post.name}
-                                                        />
-                                                    </ListItem>
-                                                );
-                                            }
-                                        })}
-                                    </List>
-                                </Collapse>
-                            </Box>
-                        );
-                    }
-                })}
+                        <Collapse
+                            key={item._id + i}
+                            in={collapsed[item._id]}
+                            timeout="auto"
+                            unmountOnExit
+                        >
+                            <List disablePadding key={Date.now() + i}>
+                                {item.articles.map((post) => {
+                                    if (post.name.includes(searchKey)) {
+                                        return (
+                                            <ListItem
+                                                onClick={() =>
+                                                    handleListClick(
+                                                        item._id,
+                                                        post._id
+                                                    )
+                                                }
+                                                key={post._id}
+                                                button
+                                            >
+                                                <ListItemText
+                                                    primary={post.name}
+                                                />
+                                            </ListItem>
+                                        );
+                                    }
+                                })}
+                            </List>
+                        </Collapse>
+                    </Box>
+                ))}
             </List>
         </Paper>
     );

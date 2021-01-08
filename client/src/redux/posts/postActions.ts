@@ -1,9 +1,9 @@
 import Post, { Article } from "../Post";
-import { postTypes } from "./postTypes";
 import { uuid } from "uuidv4";
 import { PostState } from "./postReducer";
 import { Dispatch } from "redux";
 import axios from "axios";
+import { postTypes } from "./postTypes";
 
 export interface PostFetchAction {
     type: postTypes;
@@ -18,6 +18,10 @@ export interface PostChangeAction {
 export interface PostCreateAction {
     type: postTypes;
     payload?: Post;
+}
+export interface UpdateSearch {
+    type: postTypes;
+    payload: string;
 }
 
 export const fetchPosts = () => async (dispatch: Dispatch<PostFetchAction>) => {
@@ -60,7 +64,6 @@ export const createArticle = ({
     body,
     category,
 }: Omit<Article, "_id">) => async (dispatch: Dispatch<PostCreateAction>) => {
-
     const article: Omit<Article, "_id"> = { name, body, category };
 
     try {
@@ -73,6 +76,11 @@ export const createArticle = ({
         dispatch({ type: postTypes.CREATE_POST_FAILURE, payload: error });
     }
 };
+
+export const updateSearch = (searchKey: string) => ({
+    type: postTypes.UPDATE_SEARCH,
+    payload: searchKey,
+});
 
 export const resetCurrentPost = () => ({
     type: postTypes.RESET_CURRENT_POST,
