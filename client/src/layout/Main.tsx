@@ -53,9 +53,6 @@ const Main = () => {
                                 </Typography>
                                 <PostEdit
                                     onSave={(category, name, content) => {
-                                        console.log(
-                                            `${category} ${name} ${content}`
-                                        );
                                         handlePostSave(category, name, content);
                                     }}
                                 ></PostEdit>
