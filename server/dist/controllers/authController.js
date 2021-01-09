@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authCheck = exports.login = exports.signup = void 0;
+exports.deleteUser = exports.authCheck = exports.login = exports.signup = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const usersModel_1 = __importDefault(require("../models/usersModel"));
@@ -111,3 +111,13 @@ const authCheck = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.authCheck = authCheck;
+const deleteUser = (req, res, next) => {
+    const email = req.body.email;
+    console.log(email);
+    const user = usersModel_1.default.findOneAndDelete({ email }).exec();
+    res.status(201).json({
+        status: 'success',
+        user,
+    });
+};
+exports.deleteUser = deleteUser;
