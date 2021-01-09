@@ -150,3 +150,14 @@ export const authCheck = async (
     return next(new AppError(error.message));
   }
 };
+
+export const deleteUser = (req: Request, res: Response, next: NextFunction) => {
+  const email = req.body.email;
+  console.log(email);
+
+  const user = User.findOneAndDelete({ email }).exec();
+  res.status(201).json({
+    status: 'success',
+    user,
+  });
+};
